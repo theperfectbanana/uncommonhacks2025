@@ -2,8 +2,8 @@ import MLR from "ml-regression-multivariate-linear";
 import { momentumProjection} from "./predictStock.js";
 
 /**
- * @param {array} previousStockPrices in the form [stock][price]
- * @param {array} previousItemPrices in the form [price]
+ * @param {array} previousStockPrices in the form [stock][day], length of day doesn't matter, this function takes in any bulk data and transforms it
+ * @param {array} previousItemPrices in the form [day]
  * @param {int} days 
  */
 function predictFuturePrice(previousStockPrices, previousItemPrices, days){
@@ -17,17 +17,18 @@ function predictFuturePrice(previousStockPrices, previousItemPrices, days){
     // console.log(previousStockPrices);
     // console.log(transform(previousStockPrices));
 
-    const mlr = new MLR(transform(previousStockPrices), wrap(previousItemPrices));
+    const mlr = new MLR(transform(previousStockPrices, previousItemPrices.length), wrap(previousItemPrices));
 
     return mlr.predict(futureStockPrices)[0];
 }
 
 /**
- * MLR expects [price][stock], while we like the data as [stock][price], so this function rotates it 
+ * MLR expects [day][stock], while we like the data as [stock][price], so this function rotates it 
+ * Also slices off any additional days of data that's greater that daysLength
  * @param {*} previousStockPrices 
  */
-function transform(previousStockPrices){
-    const rows = previousStockPrices[0].length;
+function transform(previousStockPrices, daysLength){
+    const rows = daysLength;
     const cols = previousStockPrices.length;
     
     // Initialize with separate arrays for each row
@@ -37,7 +38,7 @@ function transform(previousStockPrices){
     }
 
     for(let stock = 0; stock < previousStockPrices.length; ++stock)
-        for(let price = 0; price <  previousStockPrices[0].length; ++price)
+        for(let price = 0; price < daysLength; ++price)
             transformedStockPrices[price][stock] = previousStockPrices[stock][price];
         
     
@@ -58,10 +59,10 @@ function wrap(previousItemPrices){
 }
 
 const x = [
-    [200, 100, 50],
-    [484,242,121],
-    [4000, 2000, 1000],
-    [4,2,1]
+    [200, 100, 50, 3],
+    [484,242,121, 3],
+    [4000, 2000, 1000, 3],
+    [4,2,1, 3]
   ];
   
   // Corresponding asset value changes
