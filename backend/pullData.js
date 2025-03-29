@@ -1,7 +1,7 @@
 'use strict';
 import fetch from 'node-fetch'; // If using Node.js v18+, remove this line.
 
-async function getData(ticketer) {
+async function getStockData(ticketer) {
     let encodedTicketer = encodeURIComponent(ticketer);
     var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedTicketer}&outputsize=full&datatype=json&apikey=MYQCVHG7IL6Y4TG2`;
 
@@ -27,7 +27,56 @@ async function getData(ticketer) {
 }
 
 // **Example Usage**
-(async () => {
-    let stockData = await getData('AAPL');
-    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
-})();
+//(async () => {
+//    let stockData = await getData('AAPL');
+//    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
+//})();
+
+
+function csvToList(csvString) {
+    return csvString
+        .split("\n") // Split rows
+        .slice(1) // Remove header
+        .map(row => {
+            const [date, price] = row.split(",");
+            return { sellDate: date, price: price };
+        });
+}
+
+// Example CSV data
+const csvData = `Sell Date,Price
+2025-03-29,$9.99
+2025-03-28,$27.55
+2025-03-27,$2.99
+2025-03-26,$12.70
+2025-03-26,$10.50
+2025-03-26,$2.29
+2025-03-26,$17.49
+2025-03-24,$9.99
+2025-03-23,$23.49
+2025-03-22,$12.70
+2025-03-19,$15.99
+2025-03-17,$39.99
+2025-03-16,$17.99
+2025-03-15,$16.89
+2025-03-15,$14.95
+2025-03-14,$19.99
+2025-03-14,$20.00
+2025-03-13,$17.00
+2025-03-13,$39.99
+2025-03-12,$33.99
+2025-03-11,$15.00
+2025-03-11,$20.00
+2025-03-10,$10.00
+2025-03-10,$34.99
+2025-03-09,$22.99
+2025-03-09,$26.99
+2025-03-09,$16.25
+2025-03-09,$10.95
+2025-03-09,$23.29
+2025-03-09,$10.49`;
+
+// Call the function and store the result
+//const dataList = csvToList(csvData);
+// Output the result
+//console.log(dataList);
