@@ -24,11 +24,7 @@ export async function getStockData(ticketer) {
 // **Example Usage**
 (async () => {
    let stockData = await getStockData('AAPL');
-<<<<<<< HEAD
 //    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
-=======
-   console.log("Stock Data:", stockData.slice(0, 5)); 
->>>>>>> 6e8e4e08fbbd837c076506b4b35e517f36c64688
 })();
 
 export function csvToArray(csvString) {
