@@ -24,16 +24,20 @@ export async function getStockData(ticketer) {
 // **Example Usage**
 (async () => {
    let stockData = await getStockData('AAPL');
+<<<<<<< HEAD
 //    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
+=======
+   console.log("Stock Data:", stockData.slice(0, 5)); 
+>>>>>>> 6e8e4e08fbbd837c076506b4b35e517f36c64688
 })();
 
 export function csvToArray(csvString) {
     return csvString
         .split("\n") // Split rows
         .slice(1) // Remove header
-        .map(row => row.split(",")[1].replace("$", "")) // Extract price and remove $
+        .map(row => row.split(",")[1].replace("$", "")) 
         .filter(price => price !== undefined)
-        .map(price => parseFloat(price)); // Convert to float values
+        .map(price => parseFloat(price)); 
 }
 
 // Example CSV data
@@ -72,3 +76,4 @@ const csvData = `Sell Date,Price
 // Call the function and store the result
 const priceList = csvToArray(csvData);
 // console.log("Price Data:", priceList); // Output the sorted price list
+
