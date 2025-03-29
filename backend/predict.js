@@ -1,6 +1,6 @@
 import MLR from "ml-regression-multivariate-linear";
 import { momentumProjection} from "./predictStock.js";
-
+import { getStockData, csvToArray } from "./pullData.js";
 /**
  * @param {array} previousStockPrices in the form [stock][day], length of day doesn't matter, this function takes in any bulk data and transforms it
  * @param {array} previousItemPrices in the form [day]
@@ -15,7 +15,7 @@ function predictFuturePrice(previousStockPrices, previousItemPrices, days){
 
     // console.log(futureStockPrices);
     // console.log(previousStockPrices);
-    // console.log(transform(previousStockPrices));
+    // console.log(transform(previousStockPrices, previousItemPrices.length));
 
     const mlr = new MLR(transform(previousStockPrices, previousItemPrices.length), wrap(previousItemPrices));
 
@@ -58,16 +58,47 @@ function wrap(previousItemPrices){
     return wrappedArray;
 }
 
-const x = [
-    [200, 100, 50, 3],
-    [484,242,121, 3],
-    [4000, 2000, 1000, 3],
-    [4,2,1, 3]
-  ];
-  
-  // Corresponding asset value changes
-  const y = [
-   4,2,1
-  ];
+const stockPrices = [
+ await getStockData('AAPL'),
+await  getStockData('MSFT'),
+ await  getStockData('NVDA'),
+ await  getStockData('GOOGL')
+];
 
-  console.log(predictFuturePrice(x,y,2));
+// Example CSV data
+const csvData = `Sell Date,Price
+2025-03-29,$9.99
+2025-03-28,$27.55
+2025-03-27,$2.99
+2025-03-26,$12.70
+2025-03-26,$10.50
+2025-03-26,$2.29
+2025-03-26,$17.49
+2025-03-24,$9.99
+2025-03-23,$23.49
+2025-03-22,$12.70
+2025-03-19,$15.99
+2025-03-17,$39.99
+2025-03-16,$17.99
+2025-03-15,$16.89
+2025-03-15,$14.95
+2025-03-14,$19.99
+2025-03-14,$20.00
+2025-03-13,$17.00
+2025-03-13,$39.99
+2025-03-12,$33.99
+2025-03-11,$15.00
+2025-03-11,$20.00
+2025-03-10,$10.00
+2025-03-10,$34.99
+2025-03-09,$22.99
+2025-03-09,$26.99
+2025-03-09,$16.25
+2025-03-09,$10.95
+2025-03-09,$23.29
+2025-03-09,$10.49`;
+
+// Call the function and store the result
+const priceList = csvToArray(csvData);
+
+console.log(predictFuturePrice(stockPrices, priceList, 2));

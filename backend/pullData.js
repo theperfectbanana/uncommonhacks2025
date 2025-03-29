@@ -24,7 +24,7 @@ export async function getStockData(ticketer) {
 // **Example Usage**
 (async () => {
    let stockData = await getStockData('AAPL');
-   console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
+//    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
 })();
 
 export function csvToArray(csvString) {
@@ -71,4 +71,4 @@ const csvData = `Sell Date,Price
 
 // Call the function and store the result
 const priceList = csvToArray(csvData);
-console.log("Price Data:", priceList); // Output the sorted price list
+// console.log("Price Data:", priceList); // Output the sorted price list
