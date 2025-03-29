@@ -1,7 +1,7 @@
 'use strict';
 import fetch from 'node-fetch'; // If using Node.js v18+, remove this line.
 
-async function getStockData(ticketer) {
+export async function getStockData(ticketer) {
     let encodedTicketer = encodeURIComponent(ticketer);
     var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedTicketer}&outputsize=full&datatype=json&apikey=MYQCVHG7IL6Y4TG2`;
 
@@ -33,7 +33,7 @@ async function getStockData(ticketer) {
 //})();
 
 
-function csvToList(csvString) {
+export function csvToList(csvString) {
     return csvString
         .split("\n") // Split rows
         .slice(1) // Remove header
