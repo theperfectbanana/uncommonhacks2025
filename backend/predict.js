@@ -99,6 +99,6 @@ const csvData = `Sell Date,Price
 2025-03-09,$10.49`;
 
 // Call the function and store the result
-const priceList = csvToArray(csvData);
+const priceList = await getStockData('GME');
 
 console.log(predictFuturePrice(stockPrices, priceList, 2));
