@@ -12,14 +12,9 @@ export async function getStockData(ticketer) {
         const timeSeries = data["Time Series (Daily)"];
         if (!timeSeries) return [];
 
-        return Object.entries(timeSeries).map(([date, values]) => [
-            date,
-            parseFloat(values["1. open"]),
-            parseFloat(values["2. high"]),
-            parseFloat(values["3. low"]),
-            parseFloat(values["4. close"]),
-            parseInt(values["5. volume"])
-        ]);
+        return Object.entries(timeSeries)
+            .sort((a, b) => new Date(b[0]) - new Date(a[0])) // Sort by date descending
+            .map(([date, values]) => parseFloat(values["1. open"]));
     } catch (err) {
         console.error("Error fetching data:", err);
         return [];
@@ -27,19 +22,21 @@ export async function getStockData(ticketer) {
 }
 
 // **Example Usage**
-//(async () => {
-//    let stockData = await getStockData('AAPL');
-//    console.log("Stock Data:", stockData.slice(0, 5)); 
-//})();
+(async () => {
+   let stockData = await getStockData('AAPL');
+   console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
+})();
 
 export function csvToArray(csvString) {
     return csvString
         .split("\n") // Split rows
         .slice(1) // Remove header
-        .map(row => row.split(","));
+        .map(row => row.split(",")[1].replace("$", "")) // Extract price and remove $
+        .filter(price => price !== undefined)
+        .map(price => parseFloat(price)); // Convert to float values
 }
 
-// CSV data of NES super mario bros
+// Example CSV data
 const csvData = `Sell Date,Price
 2025-03-29,$9.99
 2025-03-28,$27.55
@@ -73,6 +70,5 @@ const csvData = `Sell Date,Price
 2025-03-09,$10.49`;
 
 // Call the function and store the result
-//const dataArray = csvToArray(csvData);
-// Output the result
-//console.log(dataArray);
+const priceList = csvToArray(csvData);
+console.log("Price Data:", priceList); // Output the sorted price list
