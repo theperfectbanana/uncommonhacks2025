@@ -1,6 +1,7 @@
 import MLR from "ml-regression-multivariate-linear";
-import { momentumProjection} from "./predictStock.js";
-import { getStockData, csvToArray } from "./pullData.js";
+import { momentumProjection, ExponentialMovingAverage} from "./predictStock.js";
+import {  csvToArray } from "./pullData.js";
+import { getSortedStockValues } from "./getDataStock.js";
 /**
  * @param {array} previousStockPrices in the form [stock][day], length of day doesn't matter, this function takes in any bulk data and transforms it
  * @param {array} previousItemPrices in the form [day]
@@ -86,11 +87,57 @@ const superMarioBrosData = {
 };
 
 const stockPrices = [
- await getStockData('AAPL'),
- await  getStockData('MSFT'),
- await  getStockData('NVDA'),
- await  getStockData('GOOGL')
-];
+    await getSortedStockValues('AAPL'),
+    await getSortedStockValues('MSFT'),
+    await getSortedStockValues('NVDA'),
+    // await getSortedStockValues('AMZN'),
+    await getSortedStockValues('TSLA'),
+    await getSortedStockValues('META'),
+    await getSortedStockValues('BRK.B'),
+    await getSortedStockValues('JNJ'),
+    await getSortedStockValues('XOM'),
+    await getSortedStockValues('JPM'),
+    await getSortedStockValues('V'),
+    await getSortedStockValues('PG'),
+    await getSortedStockValues('UNH'),
+    await getSortedStockValues('HD'),
+    await getSortedStockValues('MA'),
+    await getSortedStockValues('CVX'),
+    await getSortedStockValues('PFE'),
+    await getSortedStockValues('ABBV'),
+    await getSortedStockValues('PEP'),
+    await getSortedStockValues('KO'),
+    await getSortedStockValues('COST'),
+    await getSortedStockValues('DIS'),
+    await getSortedStockValues('NFLX'),
+    await getSortedStockValues('ADBE'),
+    await getSortedStockValues('PYPL'),
+    await getSortedStockValues('INTC'),
+    await getSortedStockValues('CSCO'),
+    await getSortedStockValues('T'),
+    await getSortedStockValues('VZ'),
+    await getSortedStockValues('GS'),
+    await getSortedStockValues('MS'),
+    await getSortedStockValues('BA'),
+    await getSortedStockValues('GE'),
+    await getSortedStockValues('IBM'),
+    await getSortedStockValues('CAT'),
+    await getSortedStockValues('MMM'),
+    await getSortedStockValues('HON'),
+    await getSortedStockValues('LMT'),
+    await getSortedStockValues('NKE'),
+    await getSortedStockValues('SBUX'),
+    await getSortedStockValues('MDT'),
+    await getSortedStockValues('AMD'),
+    await getSortedStockValues('NOW'),
+    await getSortedStockValues('AMGN'),
+    await getSortedStockValues('DHR'),
+    await getSortedStockValues('BMY'),
+    await getSortedStockValues('LOW'),
+    await getSortedStockValues('TMO'),
+  ];
+  
+  
 
 // Example CSV data
 const csvData = `Sell Date,Price
@@ -126,6 +173,6 @@ const csvData = `Sell Date,Price
 2025-03-09,$10.49`;
 
 // Call the function and store the result
-const priceList = await getStockData('GME');
+const priceList = await getSortedStockValues('GOOGL');
 
-console.log(predictFuturePrice(stockPrices, priceList, 2));
+console.log(predictFuturePrice(stockPrices, priceList, 350));

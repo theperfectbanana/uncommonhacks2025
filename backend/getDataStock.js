@@ -1,32 +1,37 @@
-require('dotenv').config();
-const Alpaca = require('@alpacahq/alpaca-trade-api');
+import axios from 'axios';
 
-const alpaca = new Alpaca({
-  keyId: 'PKI4Y56FE7ERWRFKNFZO',
-  secretKey: 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI',
-  paper: true, // Set to false for live trading
-});
+const apiKey = 'PKI4Y56FE7ERWRFKNFZO';
+const secretKey = 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI';
 
-async function getSortedBpValues(ticker) {
+export async function getSortedStockValues(ticker) {
   try {
-    const start = new Date('2024-01-03T00:00:00Z').toISOString();
-    const end = new Date('2025-01-04T09:30:00-04:00').toISOString();
-
-    const quotes = await alpaca.getQuotesV2(ticker, {
-      start,
-      end,
-      timeframe: '1D',
-      limit: 1000,
-      feed: 'sip',
-      sort: 'asc',
+    const api = axios.create({
+      baseURL: 'https://data.alpaca.markets/v2',
+      headers: {
+        'APCA-API-KEY-ID': apiKey,
+        'APCA-API-SECRET-KEY': secretKey
+      }
+    });
+    
+    const response = await api.get('/stocks/bars', {
+      params: {
+        symbols: ticker,
+        timeframe: '1Day',
+        start: '2019-01-03T01:02:03.123Z',
+        end: '2024-03-19T01:02:03.123Z',
+        limit: 500,
+        adjustment: 'raw',
+        feed: 'sip',
+        sort: 'asc'
+      }
     });
 
-    const bpValues = [];
-    for await (let quote of quotes) {
-      console.log(quote);
-      bpValues.push(quote.BidPrice); // Assuming 'bp' is the bid price
-    }
-
+    // The Alpaca API returns data in a specific format
+    // The structure is typically: response.data.bars[ticker]
+    const quotes = response.data.bars[ticker] || [];
+    
+    const bpValues = quotes.map(quote => quote.c); // Extract closing prices
+    
     return bpValues.reverse(); // Reverse to get most recent first
   } catch (err) {
     console.error('Error fetching stock quotes:', err.message);
@@ -35,6 +40,6 @@ async function getSortedBpValues(ticker) {
 }
 
 // Example usage:
-// getSortedBpValues('AAPL').then(bpValues => {
+// getSortedStockValues('AAPL').then(bpValues => {
 //   console.log('Sorted BP values for AAPL:', bpValues);
 // });

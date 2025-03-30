@@ -1,19 +1,27 @@
-import testalpacadocs from '@api/testalpacadocs';
+import axios from 'axios';
 
-// Set the base URL for the Data API
-testalpacadocs.auth('PKI4Y56FE7ERWRFKNFZO', 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI', {
-  base_url: 'https://data.alpaca.markets/v2/stocks/bars'
+const apiKey = 'PKI4Y56FE7ERWRFKNFZO';
+const secretKey = 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI';
+
+const api = axios.create({
+  baseURL: 'https://data.alpaca.markets/v2',
+  headers: {
+    'APCA-API-KEY-ID': apiKey,
+    'APCA-API-SECRET-KEY': secretKey
+  }
 });
 
-testalpacadocs.stockBars({
-  symbols: 'AAPL',
-  timeframe: '1Min',
-  start: '2024-01-03T01%3A02%3A03.123456789Z',
-  end: '2024-01-04T01%3A02%3A03.123456789Z',
-  limit: '10',
-  adjustment: 'raw',
-  feed: 'sip',
-  sort: 'asc'
+api.get('/stocks/bars', {
+  params: {
+    symbols: 'AAPL',
+    timeframe: '1Day',
+    start: '2024-01-03T01:02:03.123Z',
+    end: '2025-01-04T01:02:03.123Z',
+    limit: 10,
+    adjustment: 'raw',
+    feed: 'sip',
+    sort: 'asc'
+  }
 })
-  .then(({ data }) => console.log(data))
-  .catch(err => console.error(err);
+.then(response => console.log(response.data.bars.AAPL))
+.catch(error => console.error(error));
