@@ -18,7 +18,7 @@ export async function getSortedStockValues(ticker, days) {
         symbols: ticker,
         timeframe: '1Day',
         start: getPastDate(days),
-        end: getPastDate(1),
+        end: getPastDate(0),
         limit: days,
         adjustment: 'raw',
         feed: 'sip',
