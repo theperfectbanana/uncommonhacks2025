@@ -3,7 +3,7 @@ import axios from 'axios';
 const apiKey = 'PKI4Y56FE7ERWRFKNFZO';
 const secretKey = 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI';
 
-export async function getSortedStockValues(ticker) {
+export async function getSortedStockValues(ticker, days) {
   try {
     const api = axios.create({
       baseURL: 'https://data.alpaca.markets/v2',
@@ -17,9 +17,9 @@ export async function getSortedStockValues(ticker) {
       params: {
         symbols: ticker,
         timeframe: '1Day',
-        start: '2019-01-03T01:02:03.123Z',
-        end: '2024-03-19T01:02:03.123Z',
-        limit: 500,
+        start: getPastDate(days),
+        end: getPastDate(1),
+        limit: days,
         adjustment: 'raw',
         feed: 'sip',
         sort: 'asc'
@@ -39,7 +39,15 @@ export async function getSortedStockValues(ticker) {
   }
 }
 
+function getPastDate(n) {
+  const date = new Date(); // Create a Date object from the current date
+  date.setDate(date.getDate() - n - 1);  // Subtract 'n' days from the current date
+  return date.toISOString(); // Return the date in YYYY-MM-DD format
+}
+
 // Example usage:
-// getSortedStockValues('AAPL').then(bpValues => {
-//   console.log('Sorted BP values for AAPL:', bpValues);
-// });
+getSortedStockValues('AAPL', 500).then(bpValues => {
+  console.log('Sorted BP values for AAPL:', bpValues);
+});
+
+console.log(new Date().toISOString());
