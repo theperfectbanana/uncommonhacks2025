@@ -1,11 +1,8 @@
 import { Container, Flex, Text, HStack, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { PlusSquareIcon } from "@chakra-ui/icons";
-import { GiRetroController, GiConsoleController } from "react-icons/gi";
+import { GiConsoleController } from "react-icons/gi";
 import { SiApplearcade } from "react-icons/si";
 import { FaTrophy } from "react-icons/fa";
-import { CiViewTable } from "react-icons/ci";
-import "@fontsource-variable/pixelify-sans";
 import "@fontsource/fusion-pixel-12px-proportional-sc";
 
 const Navbar = () => {
