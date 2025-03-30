@@ -6,7 +6,7 @@
  */
 export function momentumProjection(historicalPrices, days){
     let momentum = (historicalPrices[0] - historicalPrices[days])/historicalPrices[days];
-    return historicalPrices[0] * momentum;
+    return Math.max(historicalPrices[0] * momentum, historicalPrices[0]);
 }
 
 /**
@@ -25,7 +25,7 @@ export function ExponentialMovingAverage(historicalPrices, days){
         ema = (closes[i] * alpha) + (ema * (1 - alpha));
     }
 
-    console.log(ema);
+    // console.log(ema);
 
     return ema;
 }
