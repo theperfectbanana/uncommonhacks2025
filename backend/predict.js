@@ -58,6 +58,33 @@ function wrap(previousItemPrices){
     return wrappedArray;
 }
 
+const superMarioBrosData = {
+    "Nintendo": {
+        "company": "Nintendo Co., Ltd.",
+        "ticker": "NTDOY",
+        "iconicGames": ["Super Mario Bros.", "The Legend of Zelda"],
+        "contribution": "Creator of the NES and its iconic games"
+    },
+    "Capcom": {
+        "company": "Capcom Co., Ltd.",
+        "ticker": "CCOEY",
+        "iconicGames": ["Mega Man", "Ghosts 'n Goblins"],
+        "contribution": "Developed several NES classics"
+    },
+    "Konami": {
+        "company": "Konami Holdings Corporation",
+        "ticker": "KNMCY",
+        "iconicGames": ["Castlevania", "Contra"],
+        "contribution": "Produced NES games such as Castlevania and Contra"
+    },
+    "BandaiNamco": {
+        "company": "Bandai Namco Holdings Inc.",
+        "ticker": "7832.T",
+        "iconicGames": ["Pac-Man"],
+        "contribution": "Published retro games like Pac-Man that were ported to the NES"
+    }
+};
+
 const stockPrices = [
  await getStockData('AAPL'),
  await  getStockData('MSFT'),
