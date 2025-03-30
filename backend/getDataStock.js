@@ -18,7 +18,7 @@ export async function getSortedStockValues(ticker, days) {
         symbols: ticker,
         timeframe: '1Day',
         start: getPastDate(days),
-        end: getPastDate(0),
+        end: getPastDate(1),
         limit: days,
         adjustment: 'raw',
         feed: 'sip',
@@ -41,7 +41,7 @@ export async function getSortedStockValues(ticker, days) {
 
 function getPastDate(n) {
   const date = new Date(); // Create a Date object from the current date
-  date.setDate(date.getDate() - n - 1);  // Subtract 'n' days from the current date
+  date.setDate(date.getDate() - n);  // Subtract 'n' days from the current date
   return date.toISOString(); // Return the date in YYYY-MM-DD format
 }
 
