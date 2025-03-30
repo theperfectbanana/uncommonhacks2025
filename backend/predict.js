@@ -60,7 +60,7 @@ function wrap(previousItemPrices){
 
 const stockPrices = [
  await getStockData('AAPL'),
-await  getStockData('MSFT'),
+ await  getStockData('MSFT'),
  await  getStockData('NVDA'),
  await  getStockData('GOOGL')
 ];

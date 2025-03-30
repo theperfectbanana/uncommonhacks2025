@@ -1,31 +1,54 @@
 'use strict';
 import fetch from 'node-fetch'; // If using Node.js v18+, remove this line.
 
-export async function getStockData(ticketer) {
-    let encodedTicketer = encodeURIComponent(ticketer);
-    var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedTicketer}&outputsize=full&datatype=json&apikey=MYQCVHG7IL6Y4TG2`;
+// export async function getStockData(ticketer) {
+//     let encodedTicketer = encodeURIComponent(ticketer);
+//     var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodedTicketer}&outputsize=full&datatype=json&apikey=MYQCVHG7IL6Y4TG2`;
 
-    try {
-        let response = await fetch(url, { headers: { 'User-Agent': 'request' } });
-        let data = await response.json();
+//     try {
+//         let response = await fetch(url, { headers: { 'User-Agent': 'request' } });
+//         let data = await response.json();
 
-        const timeSeries = data["Time Series (Daily)"];
-        if (!timeSeries) return [];
+//         const timeSeries = data["Time Series (Daily)"];
+//         if (!timeSeries) return [];
 
-        return Object.entries(timeSeries)
-            .sort((a, b) => new Date(b[0]) - new Date(a[0])) // Sort by date descending
-            .map(([date, values]) => parseFloat(values["1. open"]));
-    } catch (err) {
-        console.error("Error fetching data:", err);
-        return [];
-    }
-}
+//         return Object.entries(timeSeries)
+//             .sort((a, b) => new Date(b[0]) - new Date(a[0])) // Sort by date descending
+//             .map(([date, values]) => parseFloat(values["1. open"]));
+//     } catch (err) {
+//         console.error("Error fetching data:", err);
+//         return [];
+//     }
+// }
 
-// **Example Usage**
-(async () => {
-   let stockData = await getStockData('AAPL');
-//    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
-})();
+// // **Example Usage**
+// (async () => {
+//    let stockData = await getStockData('AAPL');
+// //    console.log("Stock Data:", stockData.slice(0, 5)); // ✅ Show first 5 values
+// })();
+
+import Alpaca from "@alpacahq/alpaca-trade-api";
+
+// Alpaca() requires the API key and sectret to be set, even for crypto
+const alpaca = new Alpaca({
+  keyId: "PKI4Y56FE7ERWRFKNFZO",
+  secretKey: "Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI",
+});
+
+let options = {
+    start: "2022-09-01",
+    end: "2022-09-07",
+    timeframe: alpaca.newTimeframe(1, alpaca.timeframeUnit.DAY),
+  };
+
+  
+  (async () => {  
+    const bars = await alpaca.getCryptoBars(["BTC/USD"], options);
+  
+    console.table(bars.get("BTC/USD"));
+  })();
+  
+
 
 export function csvToArray(csvString) {
     return csvString
