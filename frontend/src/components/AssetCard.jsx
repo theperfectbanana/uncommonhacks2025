@@ -20,16 +20,15 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useBudget } from "../context/BudgetContext";
 
-const AssetCard = ({ asset }) => {
+const AssetCard = ({ asset, purchase }) => {
+  const { remainingBudget } = useBudget();
   const [quantity, setQuantity] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const color = "green";
 
-  const handleAssetPurchase = (assetId, quantity) => {
-    console.log("ID:", assetId)
-    console.log("Quantity:", quantity)
-  }
+  const potentialCost = asset.price * quantity;
+  const wouldExceedBudget = potentialCost > remainingBudget;
 
   return (
     <Box
@@ -76,25 +75,30 @@ const AssetCard = ({ asset }) => {
           <ModalHeader alignSelf={"center"}>Purchase Asset</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <VStack spacing={4}>
-              <Input
-                placeholder="Quantity to Purchase"
-                name="quantity"
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                onFocus={(e) => e.currentTarget.select()}
-              />
-            </VStack>
+            <Input
+              placeholder="Quantity to Purchase"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              onFocus={(e) => e.currentTarget.select()}
+            />
           </ModalBody>
 
           <ModalFooter>
             <Flex direction="column" w="100%" justifyContent="flex-start">
-              <Text fontWeight={"bold"} color={color} as={"h3"} textAlign="left">
-                Price: ${!Number.isNaN(asset.price) ? quantity * asset.price : 0}
+              <Text color={wouldExceedBudget ? "red.500" : "inherit"}>
+                Price: ${potentialCost}
+                {wouldExceedBudget && " (Exceeds budget!)"}
               </Text>
             </Flex>
-            <Button colorScheme="blue" mr={3} onClick={() => handleAssetPurchase(asset.id, quantity)}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                purchase(asset.id, quantity);
+                onClose();
+              }}
+              isDisabled={wouldExceedBudget || quantity <= 0}
+            >
               Buy
             </Button>
             <Button variant={"ghost"} onClick={onClose}>

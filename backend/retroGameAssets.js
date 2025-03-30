@@ -1,36 +1,66 @@
-import fs from "fs";
-import axios from "axios";
+// Replace JSON file with a JavaScript object
+const assets = [
+  {
+    id: 1,
+    name: "NES Cartridge",
+    stock: "NTDOY",
+    current_market_price: 750.0,
+    rarity_factor: 5,
+  },
+  {
+    id: 2,
+    name: "SNES Console",
+    stock: "NTDOY",
+    current_market_price: 425.0,
+    rarity_factor: 4,
+  },
+  {
+    id: 3,
+    name: "Sega Genesis Console",
+    stock: "SGAMY",
+    current_market_price: 250.0,
+    rarity_factor: 5,
+  },
+  {
+    id: 4,
+    name: "Arcade Machine (Pac-Man)",
+    stock: "NTDOY",
+    current_market_price: 2500.0,
+    rarity_factor: 7,
+  },
+  {
+    id: 5,
+    name: "Pokémon Red Cartridge",
+    stock: "NTDOY",
+    current_market_price: 1300.0,
+    rarity_factor: 6,
+  },
+];
 
-// Load the JSON data
-const assets = JSON.parse(fs.readFileSync("retro_game_assets.json", "utf8"));
-
-// Function to find stock symbol and current price by asset ID
-function findStockById(assetId) {
+// Function to find stock by asset ID
+async function findStockById(assetId) {
   const asset = assets.find((a) => a.id === assetId);
-  if (!asset) {
-    throw new Error(`Asset with ID ${assetId} not found.`);
-  }
+  if (!asset) throw new Error(`Asset with ID ${assetId} not found.`);
   return { stock: asset.stock, currentPrice: asset.current_market_price };
 }
 
-// Function to fetch historical stock data from an API
+// Function to fetch historical stock data
 async function fetchStockData(stockSymbol) {
-  const apiKey = "a5fdf9dcaed56e19197bcad5f4cd6049"; // Replace with your Marketstack API key
-  const url = `http://api.marketstack.com/v1/eod?access_key=${apiKey}&symbols=${stockSymbol}&limit=30`;
+  const apiKey = "a5fdf9dcaed56e19197bcad5f4cd6049";
+  const url = `https://api.marketstack.com/v1/eod?access_key=${apiKey}&symbols=${stockSymbol}&limit=30`;
 
   try {
-    const response = await axios.get(url);
-    const data = response.data;
-
-    if (!data || !data.data || data.data.length === 0) {
-      throw new Error(`No time series data found for stock: ${stockSymbol}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API Error: ${errorText}`);
     }
 
-    // Extract closing prices from the last 30 days
+    const data = await response.json();
     const prices = data.data.map((entry) => entry.close);
     return prices;
   } catch (error) {
-    console.error(`Error fetching stock data for ${stockSymbol}:`, error.message);
+    console.error(`Error fetching ${stockSymbol}:`, error.message);
     throw error;
   }
 }
@@ -70,7 +100,7 @@ function predictAssetPrice(
   rarityFactor = 1,
   volatilityFactor = 1.2
 ) {
-  const baselineGrowthRate = rarityFactor * 0.01; 
+  const baselineGrowthRate = rarityFactor * 0.01;
   const predictedPrice =
     currentAssetPrice * (1 + predictedStockReturn * volatilityFactor) +
     currentAssetPrice * baselineGrowthRate;
@@ -79,18 +109,18 @@ function predictAssetPrice(
   return Math.max(predictedPrice, currentAssetPrice * (1 + baselineGrowthRate));
 }
 
-// Main function to calculate predicted asset values over 12 months
+// Main function to calculate predicted asset values over the next year
 async function predictAssetValues(assetId) {
   try {
     // Step 1: Find stock symbol and current price by ID
-    const { stock, currentPrice } = findStockById(assetId);
+    const { stock, currentPrice } = await findStockById(assetId);
 
     // Step 2: Fetch historical stock data
     const prices = await fetchStockData(stock);
 
-    // Step 3: Predict monthly asset values for the next 12 months
+    // Step 3: Predict monthly asset values for the next year (12 months)
     let predictedPrices = [];
-    let currentAssetPrice = currentPrice; // Initialize with the JSON's current price
+    let currentAssetPrice = currentPrice; // Initialize with the object's current price
     let currentStockPrice = prices[0];
 
     for (let i = 0; i < 12; i++) {
@@ -126,12 +156,14 @@ async function predictAssetValues(assetId) {
 }
 
 // Example usage:
-(async () => {
-  try {
-    const assetId = 1; // Replace with desired asset ID
-    const predictions = await predictAssetValues(assetId);
-    console.log("Predicted Asset Values for the Next 12 Months:", predictions);
-  } catch (error) {
-    console.error(error.message);
-  }
-})();
+// (async () => {
+//   try {
+//     const assetId = 1; // Replace with desired asset ID
+//     const predictions = await predictAssetValues(assetId);
+//     console.log("Predicted Asset Values for the Next Year:", predictions);
+//   } catch (error) {
+//     console.error(error.message);
+//   }
+// })();
+
+export default predictAssetValues;

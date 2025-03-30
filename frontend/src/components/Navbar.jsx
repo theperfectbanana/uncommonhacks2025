@@ -39,14 +39,6 @@ const Navbar = () => {
               </HStack>
             </Button>
           </Link>
-          <Link to={"/review"}>
-            <Button>
-              <HStack>
-                <Text>View Leaderboard</Text>
-                <FaTrophy fontSize={25} />
-              </HStack>
-            </Button>
-          </Link>
         </HStack>
       </Flex>
     </Container>

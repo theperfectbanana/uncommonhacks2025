@@ -7,11 +7,29 @@ import { useState } from "react";
 import { useBudget } from "../context/BudgetContext";
 
 const CreateSimulation = () => {
-  const { remainingBudget, deductPurchase } = useBudget();
+  const {remainingBudget, deductPurchase} = useBudget();
   const [submissionObject, setSubmissionObject] = useState({});
-  const [graphDataSet, setGraphDataSet] = useState([]); // State for graph data
-  const [initialInvestments, setInitialInvestments] = useState({});
-  const [finalValues, setFinalValues] = useState({});
+  const handleAssetPurchase = (assetId, quantity) => {
+    console.log("ID:", assetId);
+    console.log("Quantity:", quantity);
+
+    const asset = assets.find(a => a.id === assetId);
+    const totalCost = asset.price * quantity;
+
+    setSubmissionObject((prev) => ({
+      ...prev,
+      [assetId]: quantity,
+    }));
+  };
+
+  const calculateTotalCost = (submission) => {
+    return Object.entries(submission).reduce((total, [assetId, quantity]) => {
+      const asset = assets.find((a) => a.id === Number(assetId));
+      return total + (asset?.price || 0) * quantity;
+    }, 0);
+  };
+
+  const currentTotal = calculateTotalCost(submissionObject);
 
   const assets = [
     {
@@ -20,7 +38,6 @@ const CreateSimulation = () => {
       price: 750,
       image:
         "https://i.etsystatic.com/8948780/r/il/d05f1c/2249784869/il_fullxfull.2249784869_m0jy.jpg",
-      stock: "NTDOY",
     },
     {
       id: 2,
@@ -28,7 +45,6 @@ const CreateSimulation = () => {
       price: 425,
       image:
         "https://s.yimg.com/ny/api/res/1.2/wFkwHBZRWi62yYz4l0QQag--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyNDI7aD03ODQ-/https://s.yimg.com/os/en_US/News/BGR_News/nintendo-snes-console.jpg?quality=98&strip=all",
-      stock: "NTDOY",
     },
     {
       id: 3,
@@ -36,7 +52,6 @@ const CreateSimulation = () => {
       price: 250,
       image:
         "https://retrogamingofdenver.com/cdn/shop/products/image_19a34d5d-7ef8-4b4c-83a6-534f56023e5e.jpg?v=1723739633",
-      stock: "SGAMY",
     },
     {
       id: 4,
@@ -44,7 +59,6 @@ const CreateSimulation = () => {
       price: 2500,
       image:
         "https://assets.wfcdn.com/im/95366789/resize-h400-w400%5Ecompr-r85/2705/270509742/412+Classic+Retro+Games+Tabletop+Arcade+Machine+by+Doc+and+Pies+Arcade+Factory+%28Yellow%29.jpg",
-      stock: "NTDOY",
     },
     {
       id: 5,
@@ -52,71 +66,10 @@ const CreateSimulation = () => {
       price: 1300,
       image:
         "https://ae01.alicdn.com/kf/S3fe6bad037af4061a826071dda2b8f060/Pokemon-GB-GBC-Card-16-Bit-Video-Game-Cartridge-Console-Card-Gameboy-Color-Classic-Game-Collect.jpg",
-      stock: "NTDOY",
     },
   ];
 
-  const handleAssetPurchase = (assetId, quantity) => {
-    console.log("ID:", assetId);
-    console.log("Quantity:", quantity);
-
-    const asset = assets.find((a) => a.id === assetId);
-    const totalCost = asset.price * quantity;
-
-    deductPurchase(totalCost);
-
-    setSubmissionObject((prev) => ({
-      ...prev,
-      [assetId]: quantity,
-    }));
-  };
-
-  const handleSubmission = async () => {
-    try {
-      if (!submissionObject || Object.keys(submissionObject).length === 0) {
-        console.log("No assets selected");
-        return;
-      }
-
-      let dataset = [];
-      const newInitialInvestments = {};
-      const newFinalValues = {};
-
-      for (const [assetIdStr, quantity] of Object.entries(submissionObject)) {
-        const assetId = parseInt(assetIdStr);
-        const asset = assets.find((a) => a.id === assetId);
-
-        // Get predictions for this asset
-        const predictions = await predictAssetValues(assetId);
-
-        if (predictions?.length > 0) {
-          const initialInvestment = asset.price * quantity;
-          const finalValue = predictions[predictions.length - 1] * quantity;
-
-          newInitialInvestments[assetId] = initialInvestment;
-          newFinalValues[assetId] = finalValue;
-
-          dataset.push(predictions.map((value) => value * quantity));
-        }
-      }
-
-      setInitialInvestments(newInitialInvestments);
-      setFinalValues(newFinalValues);
-
-      const graphDataSet = sumColumns(dataset);
-      setGraphDataSet(graphDataSet);
-    } catch (error) {
-      console.error("Submission failed:", error);
-    }
-  };
-
-  const sumColumns = (matrix) => {
-    if (matrix.length === 0 || matrix[0].length === 0) return [];
-
-    return matrix[0].map((_, columnIndex) =>
-      matrix.reduce((sum, row) => sum + (row[columnIndex] || 0), 0),
-    );
-  };
+  const handleSubmission = ({ submission }) => { };
 
   return (
     <Box>
@@ -135,7 +88,12 @@ const CreateSimulation = () => {
           position={"relative"}
         >
           <div style={{ width: "100%", height: "100%" }}>
-            <Graph data={graphDataSet} /> {/* Pass updated graph data */}
+            <Graph
+              data={[
+                9450, 9145, 9495, 8642, 8646, 7887, 8615, 8285, 7546, 8094,
+                8464, 7951,
+              ]}
+            />
           </div>
         </Box>
         <Box
@@ -153,13 +111,11 @@ const CreateSimulation = () => {
         >
           <InvestmentDetails
             button={[
-              <Box mt={0} key={0}>
-                <Button onClick={handleSubmission}>Run Simulation</Button>
+              <Box mt={0}>
+                <Button onClick={handleSubmission(submissionObject)}>Run Simulation</Button>
               </Box>,
             ]}
-            assets={assets}
-            initialInvestments={initialInvestments}
-            finalValues={finalValues}
+            remainingBudget={remainingBudget}
           />
         </Box>
       </HStack>
