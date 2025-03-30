@@ -1,6 +1,6 @@
 import MLR from "ml-regression-multivariate-linear";
 import { momentumProjection, ExponentialMovingAverage} from "./predictStock.js";
-import {  csvToArray } from "./pullData.js";
+import {  csvToArray } from "./util.js";
 import { getSortedStockValues } from "./getDataStock.js";
 /**
  * @param {array} previousStockPrices in the form [stock][day], length of day doesn't matter, this function takes in any bulk data and transforms it

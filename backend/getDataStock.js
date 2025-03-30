@@ -3,6 +3,13 @@ import axios from 'axios';
 const apiKey = 'PKI4Y56FE7ERWRFKNFZO';
 const secretKey = 'Mn5f9cLbqUkaNd0yTPhGtjDBDdKkzxBjWNhzaqWI';
 
+
+/**
+ * //takes in a string that represents a stock and number of days in the future you want to predict and output a predicted price
+ * @param {*} ticker stock ticker
+ * @param {*} days days in the future you want to predict
+ * @returns float of predicted price of stock
+ */
 export async function getSortedStockValues(ticker, days) {
   try {
     const api = axios.create({
@@ -13,6 +20,7 @@ export async function getSortedStockValues(ticker, days) {
       }
     });
     
+    //call api
     const response = await api.get('/stocks/bars', {
       params: {
         symbols: ticker,
@@ -26,26 +34,30 @@ export async function getSortedStockValues(ticker, days) {
       }
     });
 
-    // The Alpaca API returns data in a specific format
-    // The structure is typically: response.data.bars[ticker]
+    //store closing prices and reverse it to ensure the most recent price is first
     const quotes = response.data.bars[ticker] || [];
     
-    const bpValues = quotes.map(quote => quote.c); // Extract closing prices
+    const bpValues = quotes.map(quote => quote.c); 
     
-    return bpValues.reverse(); // Reverse to get most recent first
+    return bpValues.reverse();
   } catch (err) {
     console.error('Error fetching stock quotes:', err.message);
     return [];
   }
 }
 
+/**
+ * returns date n days ago
+ * @param {*} n number of days in the past
+ * @returns string of date n days ago
+ */
 function getPastDate(n) {
-  const date = new Date(); // Create a Date object from the current date
-  date.setDate(date.getDate() - n);  // Subtract 'n' days from the current date
-  return date.toISOString(); // Return the date in YYYY-MM-DD format
+  const date = new Date(); 
+  date.setDate(date.getDate() - n);  
+  return date.toISOString(); 
 }
 
-// // Example usage:
+// // Test
 // getSortedStockValues('AAPL', 500).then(bpValues => {
 //   console.log('Sorted BP values for AAPL:', bpValues);
 // });
