@@ -45,9 +45,7 @@ function getPastDate(n) {
   return date.toISOString(); // Return the date in YYYY-MM-DD format
 }
 
-// Example usage:
-getSortedStockValues('AAPL', 500).then(bpValues => {
-  console.log('Sorted BP values for AAPL:', bpValues);
-});
-
-console.log(new Date().toISOString());
+// // Example usage:
+// getSortedStockValues('AAPL', 500).then(bpValues => {
+//   console.log('Sorted BP values for AAPL:', bpValues);
+// });
