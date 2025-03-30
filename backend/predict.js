@@ -59,37 +59,58 @@ function wrap(previousItemPrices){
     return wrappedArray;
 }
 
-const superMarioBrosData = {
-    "Nintendo": {
-        "company": "Nintendo Co., Ltd.",
-        "ticker": "NTDOY",
-        "iconicGames": ["Super Mario Bros.", "The Legend of Zelda"],
-        "contribution": "Creator of the NES and its iconic games"
-    },
-    "Capcom": {
-        "company": "Capcom Co., Ltd.",
-        "ticker": "CCOEY",
-        "iconicGames": ["Mega Man", "Ghosts 'n Goblins"],
-        "contribution": "Developed several NES classics"
-    },
-    "Konami": {
-        "company": "Konami Holdings Corporation",
-        "ticker": "KNMCY",
-        "iconicGames": ["Castlevania", "Contra"],
-        "contribution": "Produced NES games such as Castlevania and Contra"
-    },
-    "BandaiNamco": {
-        "company": "Bandai Namco Holdings Inc.",
-        "ticker": "7832.T",
-        "iconicGames": ["Pac-Man"],
-        "contribution": "Published retro games like Pac-Man that were ported to the NES"
+export async function handleMultiGroupPredictions(predictionGroups, days = 30) {
+    try {
+      const allResults = {};
+      for (const groupKey in predictionGroups) {
+        if (Object.hasOwnProperty.call(predictionGroups, groupKey)) {
+          const items = predictionGroups[groupKey];
+          const referenceKeys = groupKey.split(',');
+          const referenceStocks = [];
+
+          for (const referenceKey of referenceKeys) {
+            try {
+                console.log(referenceKey.trim());
+              const stockData = await getSortedStockValues(referenceKey.trim(), days * 2);
+              referenceStocks.push(stockData);
+            } catch (error) {
+              console.error(`Error fetching reference stock ${referenceKey}:`, error);
+            }
+          }
+          if (referenceStocks.length === 0) {
+            console.error(`No valid reference stocks for group ${groupKey}`);
+            allResults[groupKey] = { error: "No valid reference stocks" };
+            continue;
+          }
+          allResults[groupKey] = {};
+          for (const itemKey of items) {
+            try {
+   
+              const itemData = await getSortedStockValues(itemKey, days * 2);
+              const prediction = predictFuturePrice(referenceStocks, itemData, days);
+              allResults[groupKey][itemKey] = prediction;
+              
+              console.log(`Successfully predicted ${itemKey} using ${groupKey}: ${prediction}`);
+            } catch (error) {
+              console.error(`Error predicting ${itemKey} with ${groupKey}:`, error);
+              allResults[groupKey][itemKey] = null;
+            }
+          }
+        }
+      }
+      
+      return allResults;
+    } catch (error) {
+      console.error("Error in handleMultiGroupPredictions:", error);
+      throw error;
     }
-};
+  }
+  
 
 const stockPrices = [
-    await getSortedStockValues('AAPL', 500),
-    await getSortedStockValues('MSFT', 500),
-    await getSortedStockValues('NVDA', 500),
+    // await getSortedStockValues('AAPL', 500),
+    // await getSortedStockValues('MSFT', 500),
+    // await getSortedStockValues('NVDA', 500),
     // await getSortedStockValues('AMZN'),
     // await getSortedStockValues('TSLA'),
     // await getSortedStockValues('META'),
@@ -136,8 +157,167 @@ const stockPrices = [
     // await getSortedStockValues('LOW'),
     // await getSortedStockValues('TMO'),
   ];
+
+  
+//   async function testHandleMultiGroupPredictions() {
+//     try {
+//       // Sample prediction groups including some potentially invalid tickers
+//       const predictionGroups = {
+//         // Tech stocks as reference for gaming companies
+//         "MSFT,AAPL,NVDA,INVALID1": ["NTDOY", "CCOEY", "KNMCY", "FAKEGAME"],
+        
+//         // Another group with different reference stocks
+//         "GOOGL,AMZN": ["NTDOY", "DIS", "NONEXISTENT"],
+        
+//         // Test with a single reference stock
+//         "NVDA": ["AMD", "INTC"],
+        
+//         // Completely invalid group
+//         "BADSTOCK": ["ALSOFAKE"]
+//       };
+  
+//       console.log("Starting validation of stock tickers...");
+//       s
+//       const validatedGroups = await validatePredictionGroups(predictionGroups);
+      
+//       console.log("\nValidation complete.");
+//       console.log("Original groups:", Object.keys(predictionGroups).length);
+//       console.log("Validated groups:", Object.keys(validatedGroups).length);
+     
+//       if (Object.keys(validatedGroups).length === 0) {
+//         console.log("No valid prediction groups to process. Test aborted.");
+//         return null;
+//       }
+      
+//       console.log("\nRunning predictions with validated groups:");
+//       console.log(JSON.stringify(validatedGroups, null, 2));
+
+//       const days = 30;
+//       const results = await handleMultiGroupPredictions(validatedGroups, days);
+
+//       console.log("\nPrediction Results:");
+//       console.log(JSON.stringify(results, null, 2));
+  
+//       let successCount = 0;
+//       let failureCount = 0;
+      
+//       for (const groupKey in results) {
+//         console.log(`\nGroup: ${groupKey}`);
+        
+//         for (const itemKey in results[groupKey]) {
+//           const prediction = results[groupKey][itemKey];
+//           if (prediction === null) {
+//             console.log(`  × ${itemKey}: Failed to predict`);
+//             failureCount++;
+//           } else {
+//             console.log(`  ✓ ${itemKey}: $${prediction.toFixed(2)}`);
+//             successCount++;
+//           }
+//         }
+//       }
+      
+//       console.log(`\nSuccessful predictions: ${successCount}`);
+//       console.log(`Failed predictions: ${failureCount}`);
+//       console.log(`Success rate: ${(successCount / (successCount + failureCount) * 100).toFixed(2)}%`);
+  
+//       console.log("\nTest completed!");
+//       return results;
+//     } catch (error) {
+//       console.error("Test failed with error:", error);
+//       throw error;
+//     }
+//   }
   
   
+//   testHandleMultiGroupPredictions()
+//     .then(results => {
+//       if (results) {
+//         console.log("All predictions complete.");
+//       }
+//     })
+//     .catch(error => {
+//       console.error("Error in test execution:", error);
+//     });
+
+
+
+
+
+
+
+
+
+    // export async function stockExists(ticker, timeout = 5000) {
+    //     try {
+    //       const stockDataPromise = getSortedStockValues(ticker, 1); // Just get 1 day of data to minimize API usage
+          
+    //       // Create a timeout promise
+    //       const timeoutPromise = new Promise((_, reject) => {
+    //         setTimeout(() => reject(new Error(`Timeout checking stock ${ticker}`)), timeout);
+    //       });
+          
+    //       // Race the stock data promise against the timeout
+    //       const result = await Promise.race([stockDataPromise, timeoutPromise]);
+          
+    //       // If we got here, the stock data was retrieved successfully
+    //       // Additional validation: ensure we got at least one data point
+    //       return Array.isArray(result) && result.length > 0;
+    //     } catch (error) {
+    //       console.warn(`Stock ${ticker} doesn't exist or couldn't be retrieved: ${error.message}`);
+    //       return false;
+    //     }
+    //   }
+      
+    //   /**
+    //    * Filters a prediction group to only include valid stock tickers
+    //    * @param {Object} predictionGroups - The prediction groups object
+    //    * @returns {Promise<Object>} - Promise resolving to filtered prediction groups
+    //    */
+    //   export async function validatePredictionGroups(predictionGroups) {
+    //     const validatedGroups = {};
+        
+    //     for (const groupKey in predictionGroups) {
+    //       if (Object.hasOwnProperty.call(predictionGroups, groupKey)) {
+    //         // Check reference stocks (group keys)
+    //         const referenceKeys = groupKey.split(',');
+    //         const validReferenceKeys = [];
+            
+    //         // Validate each reference stock
+    //         for (const key of referenceKeys) {
+    //           const trimmedKey = key.trim();
+    //           if (await stockExists(trimmedKey)) {
+    //             validReferenceKeys.push(trimmedKey);
+    //           } else {
+    //             console.warn(`Reference stock ${trimmedKey} is invalid and will be removed`);
+    //           }
+    //         }
+            
+    //         // If we have at least one valid reference stock
+    //         if (validReferenceKeys.length > 0) {
+    //           const newGroupKey = validReferenceKeys.join(',');
+              
+    //           // Validate the items to predict
+    //           const itemsToCheck = predictionGroups[groupKey];
+    //           const validItems = [];
+              
+    //           for (const item of itemsToCheck) {
+    //             if (await stockExists(item)) {
+    //               validItems.push(item);
+    //             } else {
+    //               console.warn(`Item stock ${item} is invalid and will be removed`);
+    //             }
+    //           }
+              
+    //           // If we have valid items to predict
+    //           if (validItems.length > 0) {
+    //             validatedGroups[newGroupKey] = validItems;
+    //           }
+    //         }
+    //       }
+    //     }
+        
+    //     return validatedGroups;
+    //   }
 
 // Example CSV data
 const csvData = `Sell Date,Price
@@ -177,4 +357,4 @@ const priceList = await getSortedStockValues('GOOGL', 500);
 
 console.log(priceList.length);
 
-console.log(predictFuturePrice(stockPrices, priceList, 100));
+// console.log(predictFuturePrice(stockPrices, priceList, 100));
