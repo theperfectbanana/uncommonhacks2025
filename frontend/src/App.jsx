@@ -3,7 +3,6 @@ import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CreateSimulation from "./pages/CreateSimulation";
-import PerformanceReview from "./pages/PerformanceReview";
 
 function App() {
   return (
@@ -12,7 +11,6 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/create" element={<CreateSimulation />} />
-        <Route path="/review" element={<PerformanceReview />} />
       </Routes>
     </Box>
  );
